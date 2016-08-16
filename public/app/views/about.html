@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+	<meta charset="UTF-8">
+	<title>NAN POS - ABOUT</title>
+
+	<!-- FOR ANGULAR ROUTING -->
+	<base href="/">
+
+	<!-- CSS  -->
+	<!-- load bootstrap from CDN and custom CSS -->
+	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+	
+	<link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/assets/css/style.css">
+
+	<!-- JS -->
+	<!-- load angular and angular-route via CDN -->
+	<script src="/bower_components/vue/dist/vue.js"></script>
+	<script src="/bower_components/vue-resource/dist/vue-resource.js"></script>
+	<script src="/bower_components/accounting.js/accounting.js"></script>
+	<!--script src="/assets/js/vue-router.js"></script-->
+</head>
+<body id="app">
+
+<!-- NAVBAR -->
+<header>
+	<div class="navbar navbar-inverse">
+	<div class="container">
+		<div class="navbar-header">
+			<a href="/" class="navbar-brand"><span class="glyphicon glyphicon-fire text-danger"></span> NAN POS </a>
+		</div>
+		<ul class="nav navbar-nav">
+			<li><a href="/"><i class="fa fa-shopping-basket" aria-hidden="true"></i>&nbsp;NOU TICKET</a></li>
+			<li><a href="/historic"><i class="fa fa-history" aria-hidden="true"></i>&nbsp;HISTÒRIC</a></li>
+			<li><a href="/tancaments"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;TANCAMENTS</a></li>
+			<!--li><a href="/users"><span class="glyphicon glyphicon-user"></span> Users</a></li-->
+		</ul>
+		<ul class="nav navbar-nav navbar-right">
+			<li><a href="/about">ABOUT</a></li>
+			<!-- <li><a href="/login">BACKEND</a></li> -->
+		</ul>
+	</div>
+	</div>
+</header>
+
+<main class="container">
+
+<div class="row">
+	<div class="col-sm-12" style="text-align: center">
+		<img src="/assets/images/adesivo-sorria-voc-esta-sendo-filmado.jpg" width="800px" >
+  </div>
+</div>
+
+</body>
+</html>

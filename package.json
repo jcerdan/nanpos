@@ -1,0 +1,21 @@
+{
+  "name": "pos",
+  "version": "0.0.1",
+  "description": "Point of Sale in MEAN Stack",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jordi Cerdan <jcerdan@tecob.com>",
+  "license": "ISC",
+  "dependencies": {
+    "accounting": "^0.4.1",
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "moment": "^2.13.0",
+    "morgan": "^1.6.1",
+    "mysql": "^2.9.0",
+    "node-mysql": "^0.4.2",
+    "node-thermal-printer": "0.0.19"
+  }
+}

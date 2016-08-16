@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+	<meta charset="UTF-8">
+	<title>NAN POS - TANCAMENTS</title>
+
+	<!-- FOR ANGULAR ROUTING -->
+	<base href="/">
+
+	<!-- CSS  -->
+	<!-- load bootstrap from CDN and custom CSS -->
+	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+	
+	<link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/assets/css/style.css">
+
+	<!-- JS -->
+	<!-- load angular and angular-route via CDN -->
+	<script type="text/javascript" src="/bower_components/vue/dist/vue.js"></script>
+	<script type="text/javascript" src="/bower_components/vue-resource/dist/vue-resource.js"></script>
+	<script type="text/javascript" src="/bower_components/accounting.js/accounting.js"></script>
+	<script type="text/javascript" src="/bower_components/jquery/dist/jquery.min.js"></script>
+	<script type="text/javascript" src="/bower_components/moment/min/moment.min.js"></script>
+	<script type="text/javascript" src="/bower_components/moment/locale/ca.js"></script>
+  <script type="text/javascript" src="/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+  <link rel="stylesheet" href="/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+	<!--script src="/assets/js/vue-router.js"></script-->
+</head>
+<body id="app">
+
+	<!-- NAVBAR -->
+	<header>
+		<div class="navbar navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a href="/" class="navbar-brand"><span class="glyphicon glyphicon-fire text-danger"></span> NAN POS </a>
+			</div>
+			<ul class="nav navbar-nav">
+				<li><a href="/"><i class="fa fa-shopping-basket" aria-hidden="true"></i>&nbsp;NOU TICKET</a></li>
+				<li><a href="/historic"><i class="fa fa-history" aria-hidden="true"></i>&nbsp;HISTÒRIC</a></li>
+				<li><a href="/tancaments"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;TANCAMENTS</a></li>
+				<!--li><a href="/users"><span class="glyphicon glyphicon-user"></span> Users</a></li-->
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="/about">ABOUT</a></li>
+				<!-- <li><a href="/login">BACKEND</a></li> -->
+			</ul>
+		</div>
+		</div>
+	</header>
+
+	<main class="container">
+		<div class="row">
+
+		<div class="panel panel-primary">
+			<div class="panel-heading">Parcial del dia {{ partial.data }}</div>
+		  <div class="panel-body">
+		    <div class="col-sm-12">
+		    	<form class="form-inline">
+					  <div class="form-group">
+					    <label>Trieu una altra data: </label>
+					    <div class='input-group date' id='datetimepicker1'>
+		          	<input type='text' class="form-control" v-model="fieldDataPartial" />
+		            <span class="input-group-addon">
+		             	<span class="glyphicon glyphicon-calendar"></span>
+		            </span>
+		          </div>
+					  </div>
+					  <button v-on:click="changeDate()" type="button" class="btn btn-default">Canvia data</button>
+					</form>
+		      <script type="text/javascript">
+		      	$(function () {
+		        	$('#datetimepicker1').datetimepicker({
+		        		format: 'YYYY-MM-DD',
+		        		dayViewHeaderFormat: 'MMMM YYYY',
+		        		locale: 'ca',
+		        	});
+		        });
+		      </script>
+		    </div>
+		  </div>
+		  <!-- Table -->
+		  <table class="table">
+		  	<thead>
+		  		<tr>
+		  			<th>Data</th>
+			    	<th>Número de tickets&nbsp;</th>
+						<th>Descomptes&nbsp;</th>
+						<th>Impostos&nbsp;</th>
+						<th>Total&nbsp;</th>
+					</tr>	
+		  	</thead>
+		    <tbody>
+		    	<tr>
+		    		<td>&nbsp;{{ partial.data }}</td>
+						<td>&nbsp;{{ partial.numberOfTickets }}</td>
+						<td>&nbsp;{{ partial.discounts | currency "€ " 2 }}</td>
+						<td>&nbsp;{{ partial.taxes | currency "€ " 2}}</td>
+						<td>&nbsp;{{ partial.amount | currency "€ " 2}}</td>
+					</tr>
+		    </tbody>
+		  </table>
+		  <div class="panel-footer">
+		  	<!-- <button class="btn btn-success" v-on:click="printPartial()">Imprimir parcial</button>
+				&nbsp;&nbsp;&nbsp;-->
+				<button class="btn btn-danger" v-on:click="closeDay()">Tancar el dia</button>
+		  </div>
+		</div>
+
+			<h2>Tancaments</h2>
+	    <div class="row">
+	    	<div class="col-sm-12">
+		    	<form class="form-inline">
+					  <div class="form-group">
+					    <label>Trieu un altre mes: </label>
+					    <div class='input-group date' id='datetimepicker2'>
+		          	<input type='text' class="form-control" v-model="dataClosings" />
+		            <span class="input-group-addon">
+		             	<span class="glyphicon glyphicon-calendar"></span>
+		            </span>
+		          </div>
+					  </div>
+					  <button v-on:click="changeList()" type="button" class="btn btn-default">Canvia data</button>
+					</form>
+		      <script type="text/javascript">
+		      	$(function () {
+		        	$('#datetimepicker2').datetimepicker({
+		        		format: 'YYYY-MM',
+		        		locale: 'ca',
+		        		viewMode: 'months'
+		        	});
+		        });
+		      </script>
+		     </div>
+	    </div>
+
+	    <div class="form-group">
+		    <label for="search">Filtre de tancaments</label>
+		    <input v-model="search" class="form-control" id="search">
+		  </div>
+
+			<table class="table table-striped table-hover table-condensed">
+				<thead>
+					<tr>
+						<th>Print</th>
+						<th style="text-align: center;">Data</th>
+						<th style="text-align: right;">Número de tickets</th>
+						<th style="text-align: right;">Descomptes</th>
+						<th style="text-align: right;">Impostos</th>
+						<th style="text-align: right;">Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(index,closing) in closings.list | filterBy search | orderBy sortKey reverse">
+						<td><button class="btn btn-info" v-on:click="printClosing(closing.idClosings)"><i class="fa fa-print"></i>&nbsp;Imprimir</button></td>
+						<td style="text-align: center;">{{ closing.data }}</td>
+						<td style="text-align: right;">{{ closing.numberOfTickets }}</td>
+						<td style="text-align: right;">{{ closing.discounts | currency "€ " 2 }}</td>
+						<td style="text-align: right;">{{ closing.taxes | currency "€ " 2 }}</td>
+						<td style="text-align: right;">{{ closing.amount | currency "€ " 2 }}</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="2"></td>
+						<td style="text-align: right;"><button class="btn btn-success" v-on:click="printMonthlyResume()">Imprimir resum mensual</button></td>
+						<td style="text-align: right;"><strong>{{ discount | currency "€ " 2 }}</strong></td>
+						<td style="text-align: right;"><strong>{{ tax | currency "€ " 2 }}</strong></td>
+						<td style="text-align: right;"><strong>{{ sum | currency "€ " 2 }}</strong></td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+		<!-- <pre>{{ $data | json }}</pre> -->
+	</main>
+
+<!--
+	<div class="modal-mask" v-show="showModal" transition="modal">
+  <div class="modal-wrapper">
+    <div class="modal-container">
+
+      <div class="modal-header">
+        <slot name="header">
+          Detall del ticket
+        </slot>
+      </div>
+      <div class="modal-body">
+        <slot name="body">
+        	ID Ticket: {{ currentTicket.idTickets }}<br/>
+          Data: {{ currentTicket.data }}<br/>
+	    		Import Total: {{ currentTicket.importTotal | currency "€ " }}<br/>
+	    		Descompte Acumulat: {{ currentTicket.descompteAcumulat | currency "€ " }}<br/>
+	    		IGI inclòs: {{ currentTicket.impostos | currency "€ " }}<br/>
+	    		<table class="table table-striped">
+	    			<thead>
+		    			<tr>
+		    				<th>Detall</th>
+		    				<th>Qu. x preu unitat</th>
+		    				<th>Descompte</th>
+		    				<th>Total</th>
+		    			</tr>
+		    		</thead>
+	    			<tbody>
+	    				<tr v-for="(index,ticketLine) in currentTicket.lines">
+	    					<td>{{ ticketLine.detail }}</td>
+	    					<td>{{ ticketLine.quantity }} x {{ ticketLine.amount | currency "€ " 2 }}</td>
+	    					<td>{{ ticketLine.discountAmount | currency "€ " 2 }} ({{ ticketLine.discountPercentage | currency '% ' }})</td>
+	    					<td>{{ ticketLine.net  | currency "€ " 2 }}</td>
+	    				</tr>
+	    			</tbody>
+	    		</table>
+        </slot>
+      </div>
+
+      <div class="modal-footer">
+        <slot name="footer">
+          <button class="modal-default-button" @click="showModal = false">TANCAR</button>
+        </slot>
+      </div>
+    </div>
+  </div>
+</div>
+	-->
+<script src="/app/tancaments.js"></script>
+
+</body>
+</html>

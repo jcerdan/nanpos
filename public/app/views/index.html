@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+	<meta charset="UTF-8">
+	<title>NAN POS - TICKET</title>
+
+	<!-- FOR ANGULAR ROUTING -->
+	<base href="/">
+
+	<!-- CSS  -->
+	<!-- load bootstrap from CDN and custom CSS -->
+	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+	
+	<link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/assets/css/style.css">
+
+	<!-- JS -->
+	<!-- load angular and angular-route via CDN -->
+	<script src="/bower_components/vue/dist/vue.js"></script>
+	<script src="/bower_components/vue-resource/dist/vue-resource.js"></script>
+	<script src="/bower_components/accounting.js/accounting.js"></script>
+	<!--script src="/assets/js/vue-router.js"></script-->
+</head>
+<body id="app">
+
+<!-- NAVBAR -->
+<header>
+	<div class="navbar navbar-inverse">
+	<div class="container">
+		<div class="navbar-header">
+			<a href="/" class="navbar-brand"><span class="glyphicon glyphicon-fire text-danger"></span> NAN POS </a>
+		</div>
+		<ul class="nav navbar-nav">
+			<li><a href="/"><i class="fa fa-shopping-basket" aria-hidden="true"></i>&nbsp;NOU TICKET</a></li>
+			<li><a href="/historic"><i class="fa fa-history" aria-hidden="true"></i>&nbsp;HISTÒRIC</a></li>
+			<li><a href="/tancaments"><i class="fa fa-lock" aria-hidden="true"></i>&nbsp;TANCAMENTS</a></li>
+			<!--li><a href="/users"><span class="glyphicon glyphicon-user"></span> Users</a></li-->
+		</ul>
+		<ul class="nav navbar-nav navbar-right">
+			<li><a href="/about">ABOUT</a></li>
+			<!-- <li><a href="/login">BACKEND</a></li> -->
+		</ul>
+	</div>
+	</div>
+</header>
+
+<main class="container">
+
+<div class="row">
+	<div class="col-sm-7">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Categoria</th>
+					<th>Quantitat x Preu</th>
+					<th>Descompte</th>
+					<th>Preu</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="(index,line) in ticketLines">
+					<td><button class="btn btn-default" type="button" v-on:click="delTicketLine(line)">X</button></td>
+					<td>{{ line.category }}</td>
+					<td>{{ line.quantity }} x {{ line.amount | currency "€ " }}</td>
+					<td style="color:red;"><span v-if="line.discountAmount > 0">{{ line.discountAmount | currency "€ " }} ({{ line.discountPercentage | currency '%' }})</span></td>
+					<td>{{ line.net | currency "€ " }}</td>
+				</tr>
+				<tr><td colspan="5">&nbsp;</td></tr>
+				<tr>
+					<td colspan="4">Descompte Acumulat</td>
+					<td style="color:red;">{{ descompteAcumulat | currency "€ " 2}} </td>
+				</tr>
+				<tr>
+					<td colspan="4">IGI inclòs</td>
+					<td >{{ IGI | currency "€ " 2}} </td>
+				</tr>
+				<tr>
+					<td colspan="4">TOTAL</td>
+					<td >{{ totalTicket | currency "€ " 2}} </td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="5" style="text-align: right;">
+						<button v-if="totalTicket != 0" class="btn btn-success" v-on:click="saveAndPrintTicket()">Guardar i Imprimir</button>	
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+		<!-- <pre>{{ $data | json }}</pre> -->
+	</div>
+	<div class="col-sm-5">
+		<div class="row">
+
+			<div class="col-sm-6">
+				<form class="form-horizontal" role="form">
+					<div class="form-group">
+						<label for="valorActual">Import</label>
+						<div class="input-group">
+							<span class="input-group-btn">
+								<button class="btn" v-bind:class="[ (currentLine.fieldFocus=='currentAmount') ? 'btn-success': 'btn-default']" type="button" v-on:click="currentLine.fieldFocus = 'currentAmount'"><i class="fa fa-eye"></i></button>
+							</span>
+					    <input type="text" class="form-control" placeholder="0.00" v-model="currentLine.amount" number readonly>
+					    <span class="input-group-btn">
+				        <button class="btn btn-default" type="button" v-on:click="currentLine.amount = ''">X</button>
+				      </span>
+				    </div>
+				  </div>	
+				  <div class="form-group">
+						<label for="quantitat">Quantitat</label>
+						<div class="input-group">
+							<span class="input-group-btn" v-if="currentLine.discountAmount < 0.01">
+				        <button class="btn btn-default" type="button" v-on:click="currentLine.quantity = +currentLine.quantity -1" v-if="currentLine.quantity > 1">-</button>
+				      </span>
+					    <input style="padding-left: 10px;" type="text" class="form-control" id="quantitat" placeholder="1" v-model="currentLine.quantity" number readonly>
+					    <span class="input-group-btn" v-if="currentLine.discountAmount < 0.01">
+				        <button class="btn btn-default" type="button" v-on:click="currentLine.quantity = +currentLine.quantity +1">+</button>
+				      </span>
+				    </div>
+				  </div>
+				  <div class="form-group">
+				    <label for="valorDescompte">Descompte</label>
+				    <div class="input-group">
+				    	<span class="input-group-btn">
+								<button class="btn" v-bind:class="[ (currentLine.fieldFocus=='amountDiscount') ? 'btn-success': 'btn-default']" type="button" v-on:click="currentLine.fieldFocus = 'amountDiscount'"><i class="fa fa-eye"></i></button>
+							</span>
+				    	<div class="input-group-addon">€</div>
+					    <input type="text" class="form-control" placeholder="0.00" v-model="currentLine.discountAmount" readonly>
+					    <span class="input-group-btn">
+				        <button class="btn btn-default" type="button" v-on:click="emptyDiscounts();">X</button>
+				      </span>
+			      </div>
+			      <div>&nbsp;</div>
+			      <div class="input-group">
+			      	<span class="input-group-btn">
+								<button class="btn" v-bind:class="[ (currentLine.fieldFocus=='percentageDiscount') ? 'btn-success': 'btn-default']"  type="button" v-on:click="currentLine.fieldFocus = 'percentageDiscount'"><i class="fa fa-eye"></i></button>
+							</span>
+				    	<div class="input-group-addon">%</div>
+					    <input type="text" class="form-control" placeholder="0.00" v-model="currentLine.discountPercentage" readonly>
+					    <span class="input-group-btn">
+				        <button class="btn btn-default" type="button" v-on:click="emptyDiscounts();">X</button>
+				      </span>
+			      </div>
+				  </div>
+				</form>
+				<h3>{{ net | currency '€'}}</h3>
+			</div>
+
+			<div class="col-sm-6">
+				<div class="row">
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(7)"><h4>&nbsp;&nbsp;7&nbsp;&nbsp;</h4></button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(8)"><h4>&nbsp;&nbsp;8&nbsp;&nbsp;</h4></button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(9)"><h4>&nbsp;&nbsp;9&nbsp;&nbsp;</h4></button>
+					</div>
+				</div>
+				<div class="row">&nbsp;&nbsp;</div>
+				<div class="row">
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(4)"><h4>&nbsp;&nbsp;4&nbsp;&nbsp;</h4></button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(5)"><h4>&nbsp;&nbsp;5&nbsp;&nbsp;</h4></button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(6)"><h4>&nbsp;&nbsp;6&nbsp;&nbsp;</h4></button>
+					</div>
+				</div>
+				<div class="row">&nbsp;&nbsp;</div>
+				<div class="row">
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(1)"><h4>&nbsp;&nbsp;1&nbsp;&nbsp;</h4></button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(2)"><h4>&nbsp;&nbsp;2&nbsp;&nbsp;</h4></button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(3)"><h4>&nbsp;&nbsp;3&nbsp;&nbsp;</h4></button>
+					</div>
+				</div>
+				<div class="row">&nbsp;&nbsp;</div>
+				<div class="row">
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="negative()"><h4>&nbsp;<i class="fa fa-minus-circle"></i>&nbsp;</h4></button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber(0)"><h4>&nbsp;&nbsp;0&nbsp;&nbsp;</h4></button>
+					</div>
+					<div class="col-sm-4">
+						<button type="button" class="btn btn-default btn-lg" v-on:click="addNumber('.')"><h4>&nbsp;&nbsp;.&nbsp;&nbsp;</h4></button>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">&nbsp;</div>
+			<div class="row">&nbsp;</div>
+
+			<div class="row">
+				<div class="col-sm-3">Nivell: {{ categories.level }}</div>
+				<div class="col-sm-9">Camí: {{ path }}</div>	
+			</div>
+
+			<div class="row">&nbsp;</div>
+
+			<div class="row">
+				<div class="col-sm-3" style="margin-bottom: 15px;" v-for="(index,category) in categories.list">
+					<button v-if="category.last == 1" type="button" class="btn btn-primary" v-on:click="addTicketLine(category.name)">{{ category.name }}</button>
+					<button v-else type="button" class="btn btn-info" v-on:click="forwardCategory(category)">{{ category.name }}</button>
+				</div>
+				<button v-if="categories.level >= 1" class="btn btn-danger" v-on:click="backwardCategory()"> << </button>
+				<!--
+				<div class="col-sm-3">
+					<button type="button" class="btn btn-default btn-block" v-on:click="addTicketLine('Pijames')">Pijames</button>
+				</div>
+				<div class="col-sm-3">
+					<button type="button" class="btn btn-default btn-block" v-on:click="addTicketLine('Calçotets')">Calçotets</button>
+				</div>
+				<div class="col-sm-3">
+					<button type="button" class="btn btn-default btn-block" v-on:click="addTicketLine('Merceria')">Merceria</button>
+				</div>
+				-->
+			</div>
+			<div class="row">&nbsp;</div>
+		</div>
+	</div>
+</div>
+
+</main>
+
+
+<div class="modal-mask" v-show="showModal" transition="modal">
+  <div class="modal-wrapper">
+    <div class="modal-container">
+
+      <div class="modal-header">
+        <slot name="header">
+          Ticket Afegit Correctament
+        </slot>
+      </div>
+      <div class="modal-body">
+        <slot name="body">
+        	<div class="row">
+        		<div class="col-md-6">
+        			<table>
+        				<tr>
+        					<td style="text-align: right;">Id. Ticket&nbsp;</td>
+        					<td>&nbsp;{{ ticketModal.idTickets }}</td>
+        				</tr>
+        				<tr>
+        					<td style="text-align: right;">Data&nbsp;</td>
+        					<td>&nbsp;{{ ticketModal.data }}</td>
+        				</tr>
+        			</table>
+	          </div>
+        		<div class="col-md-6">
+        			<table>
+        				<tr>
+        					<td style="text-align: right;">Import Total&nbsp;</td>
+        					<td>&nbsp;{{ ticketModal.importTotal | currency "€ " 2 }}</td>
+        				</tr>
+        				<tr>
+        					<td style="text-align: right;">Descompte Acumulat&nbsp;</td>
+        					<td>&nbsp;{{ ticketModal.descompteAcumulat | currency "€ " 2 }}</td>
+        				</tr>
+        				<tr>
+        					<td style="text-align: right;">IGI inclòs&nbsp;</td>
+        					<td>&nbsp;{{ ticketModal.impostos | currency "€ " 2 }}</td>
+        				</tr>
+        			</table>
+        		</div>
+        	</div>
+        	<p>&nbsp;</p>
+	    		<table class="table table-striped">
+	    			<thead>
+		    			<tr>
+		    				<th>Detall</th>
+		    				<th>Qu. x preu unitat</th>
+		    				<th>Descompte</th>
+		    				<th>Total</th>
+		    			</tr>
+		    		</thead>
+	    			<tbody>
+	    				<tr v-for="(index,ticketLine) in ticketModal.lines">
+	    					<td>{{ ticketLine.detail }}</td>
+	    					<td>{{ ticketLine.quantity }} x {{ ticketLine.amount | currency "€ " 2 }}</td>
+	    					<td>{{ ticketLine.discountAmount | currency "€ " 2 }} ({{ ticketLine.discountPercentage | currency '% ' }})</td>
+	    					<td>{{ ticketLine.net  | currency "€ " 2 }}</td>
+	    				</tr>
+	    			</tbody>
+	    		</table>
+        </slot>
+      </div>
+
+      <div class="modal-footer">
+        <slot name="footer">
+        	<div class="row">
+        		<div class="col-md-offset-8 col-md-2">
+        			<button class="modal-default-button" v-on:click="printTicket(ticketModal.idTickets);showModal=false;"><i class="fa fa-print"></i>&nbsp;IMPRIMIR</button>
+        		</div>
+        		<div class="col-md-2">
+        			<button class="modal-default-button" @click="showModal = false"><i class="fa fa-times"></i>&nbsp;TANCAR</button>
+        		</div>
+        	</div>
+        </slot>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/app/app.js"></script>
+<!--script src="/app/components/tickets/tickets.js"></script-->
+
+</body>
+</html>
