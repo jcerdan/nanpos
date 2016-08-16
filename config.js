@@ -1,6 +1,6 @@
 module.exports = {
 	'port'     : process.env.PORT || 8081,
-	'database' : 'mysql://nanpos:sonic@localhost/nanpos',
+	'database' : 'mysql://nanpos:your_password@localhost/nanpos',
 	'secret'   : 'thisisasecretwordtoencryptthings',
 	'database' : {
 		host: 'localhost',
