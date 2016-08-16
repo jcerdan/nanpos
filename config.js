@@ -6,6 +6,6 @@ module.exports = {
 		host: 'localhost',
 		database: 'nanpos',
 		username: 'nanpos',
-		password: 'sonic',
+		password: 'your_password',
 	}
 };
