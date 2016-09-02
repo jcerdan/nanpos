@@ -102,6 +102,7 @@ module.exports = function(app, express) {
       if(error) 
         throw error;
       ticketID = results.insertId;
+      console.log("ticket ID inserted", ticketID)
       var lines = req.body.lines;
       lines.forEach(function(element, index) {
         var ticketLine = {

@@ -181,13 +181,15 @@ var app = new Vue({
 				method: 'POST', 
 				data: JSON.stringify(ticket) 
 			}).then(function (response) {
+				console.log("response:", response)
 				this.$http({url: '/api/tickets/last', method: 'GET'}).then(function (response) {
 		    	console.log(response.data.ticketID);
 		    	this.$http({url: '/api/tickets/' + response.data.ticketID, method: 'GET'}).then(function (response) {
 			    	console.log(response.data);
 			    	this.ticketModal = response.data;
 			    	var ticket = response.data;
-			    	this.showModal = true;
+			    	this.showModal = true
+			    	//this.emptyCurrentTicket()
 			    }, function (error) {
 			    	console.log("error: " + error);
 			    });
