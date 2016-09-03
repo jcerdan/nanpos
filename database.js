@@ -1,5 +1,5 @@
-var config 	   = require('./config');
-var mysql 		 = require('mysql');
+var config = require('./config');
+var mysql  = require('mysql');
 
 console.log(config);
 
@@ -30,6 +30,12 @@ pool.getConnection(function(err,connection){
 	  console.log('Waiting for available connection slot');
 	});
 
+	/*
+	pool.end(function (err) {
+	  if (err) console.log('pool err: ', err);
+	  else console.log('pool end');
+	});
+	*/
 });
 
 

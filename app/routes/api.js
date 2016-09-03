@@ -1,14 +1,14 @@
-var Categories = require('../models/categories');
-var config     = require('../../config');
-var database   = require('../../database.js');
-var moment     = require('moment');
-var ticketReceipt = require('../printings/printer.js');
-var closingReceipt = require('../printings/closings.js');
-var closingMonthlyReceipt = require('../printings/closings-monthly.js');
+const Categories = require('../models/categories');
+const config     = require('../../config');
+const database   = require('../../database.js');
+const moment     = require('moment');
+const ticketReceipt = require('../printings/printer.js');
+const closingReceipt = require('../printings/closings.js');
+const closingMonthlyReceipt = require('../printings/closings-monthly.js');
 
 module.exports = function(app, express) {
 
-  var apiRouter = express.Router();
+  const apiRouter = express.Router();
 
   apiRouter.get('/', function(req, res) {
     res.json({ message: 'API access OK' });
@@ -62,7 +62,7 @@ module.exports = function(app, express) {
         console.log(err);
       }
       else{
-        var ticket = rows[0];
+        let ticket = rows[0];
         ticket.data = moment(ticket.data).format("YYYY-MM-DD HH:mm:ss");
         database.query("SELECT * FROM TicketLines WHERE Tickets_idTickets = ?", ticket.idTickets, function(err, rows, fields){
           ticket.lines = rows;
@@ -78,7 +78,7 @@ module.exports = function(app, express) {
         console.log(err);
       }
       else{
-        var ticket = rows[0];
+        let ticket = rows[0];
         ticket.data = moment(ticket.data).format("YYYY-MM-DD HH:mm:ss");
         database.query("SELECT * FROM TicketLines WHERE Tickets_idTickets = ?", ticket.idTickets, function(err, rows, fields){
           ticket.lines = rows;
@@ -92,36 +92,42 @@ module.exports = function(app, express) {
   });
 
   apiRouter.route('/tickets').post(function(req,res){
-    var ticket = {
+    let ticketID = 0
+    console.log("ticketID: ", ticketID)
+    let ticket = {
       data: moment().format("YYYY-MM-DD HH:mm:ss"),
       importTotal: req.body.totalTicket,
       descompteAcumulat: req.body.descompteAcumulat,
       impostos: req.body.IGI
     }
-    database.query('INSERT INTO Tickets SET ?', ticket, function(error,results){
-      if(error) 
-        throw error;
-      ticketID = results.insertId;
-      console.log("ticket ID inserted", ticketID)
-      var lines = req.body.lines;
-      lines.forEach(function(element, index) {
-        var ticketLine = {
-          Tickets_idTickets: ticketID,
-          amount: element.amount,
-          quantity: element.quantity,
-          discountAmount: element.discountAmount,
-          discountPercentage: element.discountPercentage,
-          net: element.net,
-          detail: element.category.trim()
-        }
-        database.query('INSERT INTO TicketLines SET ?', ticketLine, function(error, results){
-          if (error)
-            throw error;
+    database.query('INSERT INTO Tickets SET ?', ticket, function(error1, results){
+      if(error1) {
+        console.log('error 1: ', error1);
+      }
+      else{
+        console.log("result insert ticket: ", results)
+        ticketID = results.insertId;
+        console.log("ticketID: ", ticketID)
+        console.log("ticket ID inserted", ticketID)
+        let lines = req.body.lines;
+        let arrayInsert = []
+        lines.forEach(function(element, index) {
+          let ticketLine = [ticketID, element.amount, element.quantity, element.discountAmount, element.discountPercentage, element.net, element.category.trim()]
+          arrayInsert.push(ticketLine)
+        })
+        console.log("Array to insert: ", arrayInsert)
+        database.query('INSERT INTO TicketLines (Tickets_idTickets, amount, quantity, discountAmount, discountPercentage, net, detail) VALUES ?', [arrayInsert], function(error2, results2){
+          if (error2)
+            console.log('error 2: ', error2);
+          else{
+            console.log("result insert ticketline: ", results2)
+            console.log("insert ticketline ID: ", results2.insertId)
+            res.json({
+              result: ticketID
+            });
+          }
         });
-      });
-    });
-    res.json({
-      result: 'success'
+      }
     });
   });
 
@@ -159,7 +165,7 @@ module.exports = function(app, express) {
   });
 
   apiRouter.route('/closings/monthly/print').get(function(req, res){
-    var tancamentMensual = {
+    let tancamentMensual = {
       data: req.query.data,
       amount: req.query.sum,
       discounts: req.query.discount,
@@ -195,7 +201,7 @@ module.exports = function(app, express) {
   });
 
   apiRouter.route('/closings').post(function(req,res){
-    var closing = {
+    let closing = {
       data: req.body.data,
       amount: req.body.amount,
       discounts: req.body.discounts,
