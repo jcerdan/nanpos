@@ -41,6 +41,12 @@ module.exports = function(app, express) {
     });
 	});
 
+  /******** Cash Drawer ***********/
+
+  apiRouter.route('/cashdrawer').get(function(req,res){
+    cashdrawer()
+  });
+
 
   /******** Tickets ***********/
 

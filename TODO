@@ -1,0 +1,15 @@
+* Revisar tickets per caràcters especials: 'ç', etc
+* check que la nova versio de mode-thermal-printer va ok
+* check bug calendari ambjquery 3.* https://github.com/Eonasdan/bootstrap-datetimepicker/pull/1726
+* Fer que obri el calaix en imprimir un ticket
+* Afegir botó per obrir calaix quan es vulgui
+
+
+System
+------
+* backup script for database => FTP new jc0001.tecob.com
+* start script nanpos && log to file
+* start script database server (php)
+* Acces links to nanpos && phpmyadmin
+* syslog-ng
+* logrotate for nanpos log file 
