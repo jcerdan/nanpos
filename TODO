@@ -1,3 +1,5 @@
+DEVELOPMENT
+----------
 * Revisar tickets per caràcters especials: 'ç', etc
 * check que la nova versio de mode-thermal-printer va ok
 * check bug calendari ambjquery 3.* https://github.com/Eonasdan/bootstrap-datetimepicker/pull/1726
