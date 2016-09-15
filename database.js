@@ -1,8 +1,6 @@
 var config = require('./config');
 var mysql  = require('mysql');
 
-//console.log(config);
-
 var pool = mysql.createPool({
 	connectionLimit : 100, //important
 	host     : config.database.host,
