@@ -11,7 +11,7 @@
 	<!-- load bootstrap from CDN and custom CSS -->
 	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
-	
+
 	<link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="/assets/css/style.css">
 
@@ -85,7 +85,7 @@
 			<tfoot>
 				<tr>
 					<td colspan="5" style="text-align: right;">
-						<button v-if="totalTicket != 0" class="btn btn-success" v-on:click="saveAndPrintTicket()">Guardar i Imprimir</button>	
+						<button v-if="totalTicket != 0" class="btn btn-success" v-on:click="saveAndPrintTicket()">Guardar i Imprimir</button>
 					</td>
 				</tr>
 			</tfoot>
@@ -108,7 +108,7 @@
 				        <button class="btn btn-default" type="button" v-on:click="currentLine.amount = ''">X</button>
 				      </span>
 				    </div>
-				  </div>	
+				  </div>
 				  <div class="form-group">
 						<label for="quantitat">Quantitat</label>
 						<div class="input-group">
@@ -204,7 +204,7 @@
 
 			<div class="row">
 				<div class="col-sm-3">Nivell: {{ categories.level }}</div>
-				<div class="col-sm-9">Camí: {{ path }}</div>	
+				<div class="col-sm-9">Camí: {{ path }}</div>
 			</div>
 
 			<div class="row">&nbsp;</div>
@@ -301,11 +301,11 @@
       <div class="modal-footer">
         <slot name="footer">
         	<div class="row">
-        		<div class="col-md-offset-8 col-md-2">
-        			<button class="modal-default-button" v-on:click="printTicket(ticketModal.idTickets);showModal=false;"><i class="fa fa-print"></i>&nbsp;IMPRIMIR</button>
+        		<div class="col-md-offset-3 col-md-6">
+        			<button class="btn btn-success modal-default-button" v-on:click="printTicket(ticketModal.idTickets);showModal=false;"><i class="fa fa-print"></i>&nbsp;GUARDAR I <br/>IMPRIMIR</button>
         		</div>
-        		<div class="col-md-2">
-        			<button class="modal-default-button" @click="showModal = false"><i class="fa fa-times"></i>&nbsp;TANCAR</button>
+        		<div class="col-md-offset-1 col-md-2">
+        			<button class="btn btn-danger modal-default-button" @click="showModal = false"><i class="fa fa-times"></i>&nbsp;<br/>CANCELAR</button>
         		</div>
         	</div>
         </slot>

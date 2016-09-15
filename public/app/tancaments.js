@@ -44,19 +44,19 @@ var app = new Vue({
 	computed: {
 		sum: function(){
 	    var pivot = this.closings.list.reduce(function(prev, line){
-	      return prev + line.amount; 
+	      return prev + line.amount;
 	    }, 0);
 	    return accounting.toFixed(pivot, 2);
 	  },
 	  discount: function(){
 	  	var pivot = this.closings.list.reduce(function(prev, line){
-	      return prev + line.discounts; 
+	      return prev + line.discounts;
 	    }, 0);
 	    return accounting.toFixed(pivot, 2);
 	  },
 	  tax: function(){
 			var pivot = this.closings.list.reduce(function(prev, line){
-	      return prev + line.taxes; 
+	      return prev + line.taxes;
 	    }, 0);
 	    return accounting.toFixed(pivot, 2);
 	  },
@@ -83,10 +83,12 @@ var app = new Vue({
   	},
   	closeDay: function(){
   		this.$http({
-  			url: '/api/closings', 
+  			url: '/api/closings',
   			method: 'POST',
-  			data: JSON.stringify(this.partial) 
+  			data: JSON.stringify(this.partial)
   		}).then(function(response){
+				//console.log(response.data)
+				this.partial.idClosings = response.data
   			this.closings.list.push(this.partial);
   			console.log('Closing saved.', response.data);
   		}, function(error){
@@ -111,14 +113,14 @@ var app = new Vue({
   	printMonthlyResume: function(){
   		var mes = moment(this.dataClosings);
   		this.$http({
-  			url: '/api/closings/monthly/print', 
+  			url: '/api/closings/monthly/print',
   			method: 'GET',
   			data: {
   				data: mes.format("MMMM YYYY").toUpperCase(),
   				sum: this.sum,
   				discount: this.discount,
   				taxes: this.tax,
-  			} 
+  			}
   		}).then(function (response) {
 	    	console.log(response.data);
 	    	this.currentClosing = response.data;

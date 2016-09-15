@@ -223,7 +223,9 @@ module.exports = function(app, express) {
           if (error)
             throw error;
           else{
-            res.json(results);
+            idClosings = results.insertId
+            console.log("closing ID = ", idClosings);
+            res.json(idClosings);
           }
         });
       }
