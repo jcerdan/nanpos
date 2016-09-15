@@ -5,6 +5,7 @@ const moment     = require('moment');
 const ticketReceipt = require('../printings/printer.js');
 const closingReceipt = require('../printings/closings.js');
 const closingMonthlyReceipt = require('../printings/closings-monthly.js');
+const cashDrawer = require('../printings/cashdrawer.js')
 
 module.exports = function(app, express) {
 
@@ -44,7 +45,7 @@ module.exports = function(app, express) {
   /******** Cash Drawer ***********/
 
   apiRouter.route('/cashdrawer').get(function(req,res){
-    cashdrawer()
+    cashDrawer()
   });
 
 

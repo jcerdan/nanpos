@@ -14,7 +14,7 @@ var printTicket = function(ticket){
 	printer.println("Avda. Sant Antoni, 19");
 	printer.println("AD400 La Massana");
 	printer.println("Andorra");
-	printer.println("NRT: L-459876-N");
+	printer.println("NRT: L-704383-G");
 	printer.newLine();
 	printer.println(ticket.data);
 	printer.newLine();
@@ -35,7 +35,7 @@ var printTicket = function(ticket){
 		  { text: accounting.formatMoney(element.amount, "", 2, ".", ","), align:"RIGHT", width:0.20 },
 		  { text: accounting.formatMoney(element.net, "", 2, ".", ","), align:"RIGHT", width:0.20 },
 		]);
-		printer.newLine();
+		//printer.newLine();
 		if(element.discountAmount != 0){
 			printer.setTypeFontB();
 			printer.tableCustom([
@@ -45,7 +45,7 @@ var printTicket = function(ticket){
 			  { text: "-" + accounting.formatMoney(element.discountAmount, "", 2, ".", ","), align:"RIGHT", width:0.20 },
 			]);
 			printer.setTypeFontA();
-			printer.newLine();
+			//printer.newLine();
 		}
 	});
 	printer.drawLine();
@@ -66,6 +66,7 @@ var printTicket = function(ticket){
 	printer.println("Gràcies per la seva visita.");
 
 	printer.cut();
+	printer.openCashDrawer();
 	printer.execute();
 
 }
