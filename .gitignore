@@ -3,3 +3,6 @@ npm-debug.log
 public/bower_components
 nanpos.sql
 *.log
+/nbproject/private/
+/nbproject/project.properties
+/nbproject/project.xml

@@ -15,6 +15,7 @@ var printTicket = function(ticket){
 	printer.println("AD400 La Massana");
 	printer.println("Andorra");
 	printer.println("NRT: L-704383-G");
+        printer.println("https://unipunt.com");
 	printer.newLine();
 	printer.println(ticket.data);
 	printer.newLine();
